@@ -30,6 +30,7 @@ class RegisterSerializer(serializers.Serializer):
     mother_tongue = serializers.CharField(required=False, allow_blank=True, default='')
     religion_id = serializers.IntegerField(required=False, allow_null=True)
     caste_id = serializers.IntegerField(required=False, allow_null=True)
+    caste_name = serializers.CharField(required=False, allow_blank=True, default='')
     sub_caste = serializers.CharField(required=False, allow_blank=True, default='')
     nakshatra = serializers.CharField(required=False, allow_blank=True, default='')
     rashi = serializers.CharField(required=False, allow_blank=True, default='')

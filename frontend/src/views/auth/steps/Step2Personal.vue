@@ -1,15 +1,13 @@
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRegistrationStore } from '../../../stores/registration'
 import api from '../../../api/index'
 
 const reg = useRegistrationStore()
 
 interface Religion { id: number; name: string }
-interface Caste    { id: number; name: string; religion_id: number }
 
 const religions = ref<Religion[]>([])
-const castes    = ref<Caste[]>([])
 
 async function loadReligions() {
   try {
@@ -18,22 +16,8 @@ async function loadReligions() {
   } catch { /* non-blocking */ }
 }
 
-async function loadCastes(religionId: number) {
-  try {
-    const { data } = await api.get('/api/castes/', { params: { religion_id: religionId } })
-    castes.value = data
-  } catch { castes.value = [] }
-}
-
-watch(() => reg.religion_id, (id) => {
-  reg.caste_id = null
-  castes.value = []
-  if (id) loadCastes(id)
-})
-
 onMounted(() => {
   loadReligions()
-  if (reg.religion_id) loadCastes(reg.religion_id)
 })
 </script>
 
@@ -56,17 +40,14 @@ onMounted(() => {
         </select>
       </div>
       <div class="form-group">
-        <label>Caste / Community</label>
-        <select v-model.number="reg.caste_id" :disabled="!reg.religion_id">
-          <option :value="null">Select caste</option>
-          <option v-for="c in castes" :key="c.id" :value="c.id">{{ c.name }}</option>
-        </select>
+        <label>Caste / Community <span class="optional-tag">optional</span></label>
+        <input type="text" v-model="reg.caste_name" placeholder="e.g. Reddy, Nair, Iyer, Khatri" />
       </div>
     </div>
 
     <div class="form-group">
       <label>Sub-caste <span class="optional-tag">optional</span></label>
-      <input type="text" v-model="reg.sub_caste" placeholder="e.g. Reddy, Nair, Iyer" />
+      <input type="text" v-model="reg.sub_caste" placeholder="e.g. Deshastha, Karhade" />
     </div>
 
     <hr style="border:none; border-top:1px solid #eee; margin: 16px 0;" />

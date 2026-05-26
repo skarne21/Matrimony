@@ -93,6 +93,7 @@ class Profile(models.Model):
     mother_tongue = models.CharField(max_length=100, blank=True)
     religion = models.ForeignKey(Religion, on_delete=models.SET_NULL, null=True, blank=True)
     caste = models.ForeignKey(Caste, on_delete=models.SET_NULL, null=True, blank=True)
+    caste_name = models.CharField(max_length=200, blank=True)
     sub_caste = models.CharField(max_length=100, blank=True)
     nakshatra = models.CharField(max_length=100, blank=True)
     rashi = models.CharField(max_length=100, blank=True)

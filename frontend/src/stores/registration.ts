@@ -21,6 +21,7 @@ export const useRegistrationStore = defineStore('registration', () => {
   const mother_tongue = ref('')
   const religion_id = ref<number | null>(null)
   const caste_id = ref<number | null>(null)
+  const caste_name = ref('')
   const sub_caste = ref('')
   const nakshatra = ref('')
   const rashi = ref('')
@@ -90,6 +91,7 @@ export const useRegistrationStore = defineStore('registration', () => {
       mother_tongue: mother_tongue.value,
       religion_id: religion_id.value,
       caste_id: caste_id.value,
+      caste_name: caste_name.value,
       sub_caste: sub_caste.value,
       nakshatra: nakshatra.value,
       rashi: rashi.value,
@@ -138,6 +140,7 @@ export const useRegistrationStore = defineStore('registration', () => {
     mother_tongue.value = ''
     religion_id.value = null
     caste_id.value = null
+    caste_name.value = ''
     sub_caste.value = ''
     nakshatra.value = ''
     rashi.value = ''
@@ -173,7 +176,7 @@ export const useRegistrationStore = defineStore('registration', () => {
   return {
     step, phone_number, email, password, first_name, last_name, gender, dob,
     marital_status, height_cm, weight_kg, profile_created_by, mother_tongue,
-    religion_id, caste_id, sub_caste, nakshatra, rashi, is_manglik,
+    religion_id, caste_id, caste_name, sub_caste, nakshatra, rashi, is_manglik,
     education_level, college, occupation, company, annual_income, work_location,
     father_name, father_occupation, mother_name, mother_occupation,
     brothers_count, sisters_count, family_type, family_status,
