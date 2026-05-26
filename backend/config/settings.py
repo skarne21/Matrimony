@@ -14,19 +14,22 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.postgres',
     # Third-party
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
     'channels',
     'storages',
-    # Local apps (added as we build each module)
-    # 'apps.users',
-    # 'apps.profiles',
-    # 'apps.interests',
-    # 'apps.conversations',
-    # 'apps.subscriptions',
+    # Local apps
+    'apps.users',
+    'apps.profiles',
+    'apps.interests',
+    'apps.conversations',
+    'apps.subscriptions',
 ]
+
+AUTH_USER_MODEL = 'users.User'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
