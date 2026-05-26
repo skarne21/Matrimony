@@ -132,3 +132,85 @@ textarea { resize: vertical; min-height: 90px; }
   font-weight: 400;
   margin-left: 6px;
 }
+
+/* Dashboard layout */
+.dash-nav {
+  background: #fff;
+  border-bottom: 1px solid #eee;
+  padding: 0 24px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.dash-body {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 16px;
+}
+
+/* Profile detail page */
+.profile-detail-wrap {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+.detail-section {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  margin-bottom: 16px;
+}
+
+.detail-section h3 {
+  font-size: 15px;
+  font-weight: 700;
+  color: #c0392b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 16px;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 24px;
+}
+
+.detail-item label {
+  font-size: 12px;
+  color: #aaa;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.detail-item p {
+  font-size: 15px;
+  color: #222;
+  margin-top: 2px;
+}
+
+.tag {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  background: #fff5f5;
+  color: #c0392b;
+  border: 1px solid #f5c6c6;
+  margin: 3px 3px 3px 0;
+}
