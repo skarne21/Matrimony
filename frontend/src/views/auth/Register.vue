@@ -22,7 +22,7 @@ const currentComponent = computed(() => {
     <div class="card">
       <!-- Header -->
       <div style="text-align:center; margin-bottom: 24px;">
-        <h1 style="font-size:26px; font-weight:800; color:#c0392b; margin-bottom:4px;">Vivah</h1>
+        <h1 style="font-size:26px; font-weight:800; color:#c0392b; margin-bottom:4px;">Veerabhadra Matrimony</h1>
         <p style="font-size:14px; color:#888;">Create your profile — Step {{ reg.step }} of {{ stepLabels.length }}</p>
       </div>
 
