@@ -11,6 +11,11 @@ const phone = ref(auth.pendingPhone ?? '')
 const loading = ref(false)
 const error = ref('')
 
+async function quickLogin(testPhone: string) {
+  phone.value = testPhone
+  await sendOTP()
+}
+
 async function sendOTP() {
   loading.value = true
   error.value = ''
@@ -30,7 +35,7 @@ async function sendOTP() {
   <div class="page-center">
     <div class="card">
       <div style="text-align:center; margin-bottom:28px;">
-        <h1 style="font-size:26px; font-weight:800; color:#c0392b;">Vivah</h1>
+        <h1 style="font-size:26px; font-weight:800; color:#c0392b;">Veerabhadra Matrimony</h1>
         <p style="font-size:14px; color:#888; margin-top:4px;">Sign in with your mobile number</p>
       </div>
 
@@ -49,6 +54,19 @@ async function sendOTP() {
         Don't have an account?
         <RouterLink to="/register" style="color:#c0392b; font-weight:600; text-decoration:none;"> Register</RouterLink>
       </p>
+
+      <!-- Dev quick-login -->
+      <div style="margin-top:24px; padding-top:20px; border-top:1px solid #eee;">
+        <p style="font-size:12px; color:#bbb; text-align:center; margin-bottom:10px; text-transform:uppercase; letter-spacing:1px;">Dev Quick Login</p>
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-secondary btn-full" style="font-size:13px;" @click="quickLogin('+911111111111')">
+            Arjun (Male)
+          </button>
+          <button class="btn btn-secondary btn-full" style="font-size:13px;" @click="quickLogin('+912222222222')">
+            Priya (Female)
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
