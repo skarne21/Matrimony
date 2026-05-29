@@ -63,9 +63,10 @@ onMounted(() => loadPage(1))
 <template>
   <div>
     <nav class="dash-nav">
-      <span style="font-size:20px; font-weight:800; color:#c0392b;">Vivah</span>
+      <span style="font-size:20px; font-weight:800; color:#c0392b;">Veerabhadra Matrimony</span>
       <div style="display:flex; gap:12px; align-items:center;">
         <span style="font-size:14px; color:#888;">{{ total }} matches found</span>
+        <button class="btn btn-secondary" style="padding:8px 16px; font-size:13px;" @click="router.push('/interests')">Interests</button>
         <button class="btn btn-secondary" style="padding:8px 16px; font-size:13px;" @click="logout">Logout</button>
       </div>
     </nav>

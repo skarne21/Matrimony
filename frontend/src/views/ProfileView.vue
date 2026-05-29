@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useAuthStore } from '../stores/auth'
 import api from '../api/index'
 
 interface ProfileDetail {
@@ -48,16 +49,67 @@ interface ProfileDetail {
   postal_code: string
 }
 
+interface InterestState {
+  id: number
+  status: string
+  direction: 'sent' | 'received'
+}
+
 const route = useRoute()
 const router = useRouter()
+const auth = useAuthStore()
 
 const profile = ref<ProfileDetail | null>(null)
+const interest = ref<InterestState | null>(null)
 const loading = ref(true)
+const actionLoading = ref(false)
 const error = ref('')
+
+const isOwnProfile = () => auth.userId === route.params.id
 
 function fmt(val: string | number | null | undefined, fallback = '—') {
   if (val === null || val === undefined || val === '') return fallback
   return String(val)
+}
+
+async function loadInterestStatus() {
+  if (isOwnProfile()) return
+  try {
+    const { data } = await api.get(`/api/interests/with/${route.params.id}/`)
+    interest.value = data
+  } catch { /* non-blocking */ }
+}
+
+async function sendInterest() {
+  actionLoading.value = true
+  try {
+    const { data } = await api.post('/api/interests/', { receiver_id: route.params.id })
+    interest.value = { id: data.id, status: data.status, direction: 'sent' }
+  } catch { /* ignore */ } finally {
+    actionLoading.value = false
+  }
+}
+
+async function withdrawInterest() {
+  if (!interest.value) return
+  actionLoading.value = true
+  try {
+    await api.patch(`/api/interests/${interest.value.id}/`, { action: 'withdraw' })
+    interest.value = null
+  } catch { /* ignore */ } finally {
+    actionLoading.value = false
+  }
+}
+
+async function respondToInterest(action: 'accept' | 'decline') {
+  if (!interest.value) return
+  actionLoading.value = true
+  try {
+    const { data } = await api.patch(`/api/interests/${interest.value.id}/`, { action })
+    interest.value = { ...interest.value, status: data.status }
+  } catch { /* ignore */ } finally {
+    actionLoading.value = false
+  }
 }
 
 onMounted(async () => {
@@ -69,6 +121,7 @@ onMounted(async () => {
   } finally {
     loading.value = false
   }
+  await loadInterestStatus()
 })
 </script>
 
@@ -76,7 +129,7 @@ onMounted(async () => {
   <div>
     <nav class="dash-nav">
       <button class="btn btn-secondary" style="padding:8px 16px; font-size:13px;" @click="router.back()">← Back</button>
-      <span style="font-size:20px; font-weight:800; color:#c0392b;">Vivah</span>
+      <span style="font-size:20px; font-weight:800; color:#c0392b;">Veerabhadra Matrimony</span>
       <span />
     </nav>
 
@@ -103,6 +156,48 @@ onMounted(async () => {
               💼 {{ profile.occupation }}<span v-if="profile.company"> · {{ profile.company }}</span>
             </p>
             <p style="font-size:14px; color:#888; margin-top:8px; line-height:1.5;" v-if="profile.bio">{{ profile.bio }}</p>
+
+            <!-- Interest actions -->
+            <div v-if="!isOwnProfile()" style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap;">
+              <!-- No relationship -->
+              <template v-if="!interest">
+                <button class="btn btn-primary" :disabled="actionLoading" @click="sendInterest">
+                  {{ actionLoading ? '…' : '💌 Send Interest' }}
+                </button>
+              </template>
+
+              <!-- I sent, pending -->
+              <template v-else-if="interest.direction === 'sent' && interest.status === 'pending'">
+                <button class="btn btn-secondary" :disabled="actionLoading" @click="withdrawInterest">
+                  {{ actionLoading ? '…' : 'Withdraw Interest' }}
+                </button>
+              </template>
+
+              <!-- I sent, accepted -->
+              <template v-else-if="interest.direction === 'sent' && interest.status === 'accepted'">
+                <span style="background:#e8f5e9; color:#27ae60; font-size:14px; font-weight:700; padding:10px 18px; border-radius:8px;">✓ Connected</span>
+              </template>
+
+              <!-- I sent, declined -->
+              <template v-else-if="interest.direction === 'sent' && interest.status === 'declined'">
+                <span style="color:#aaa; font-size:14px; padding:10px 0;">Interest was declined</span>
+              </template>
+
+              <!-- They sent me, pending -->
+              <template v-else-if="interest.direction === 'received' && interest.status === 'pending'">
+                <button class="btn btn-primary" :disabled="actionLoading" @click="respondToInterest('accept')" style="background:#27ae60;">
+                  {{ actionLoading ? '…' : '✓ Accept' }}
+                </button>
+                <button class="btn btn-secondary" :disabled="actionLoading" @click="respondToInterest('decline')">
+                  Decline
+                </button>
+              </template>
+
+              <!-- They sent me, accepted -->
+              <template v-else-if="interest.direction === 'received' && interest.status === 'accepted'">
+                <span style="background:#e8f5e9; color:#27ae60; font-size:14px; font-weight:700; padding:10px 18px; border-radius:8px;">✓ Connected</span>
+              </template>
+            </div>
           </div>
         </div>
 
