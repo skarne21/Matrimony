@@ -1,7 +1,3 @@
-# Claude context and project planning files — kept local only
-CLAUDE.md
-plan.md
-
 # Dependencies
 node_modules/
 vendor/
