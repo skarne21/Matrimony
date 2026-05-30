@@ -359,16 +359,13 @@ This is the main Phase 1 infrastructure commit. Everything below now exists in t
 |---|---|---|
 | 1 | Infrastructure setup | Complete |
 | 2 | Database migrations & models | Complete |
-| 3 | 6-step registration (full-stack) | In progress |
-| 4 | Dashboard, search, profile view | Not started |
-| 5 | Chat, monetization, admin panel | Not started |
+| 3 | 6-step registration (full-stack) | Complete |
+| 4 | Dashboard, search, profile view | Complete |
+| 5 | Chat, monetization, admin panel | In progress |
 
-## Next Up — Phase 3: 6-Step Registration
+## Next Up — Phase 5 (continued)
 
-1. Build Pinia `registrationStore` with all fields + `sessionStorage` persistence
-2. Build Step 1–6 registration UI in Vue
-3. Build `POST /api/auth/register` endpoint in Django
-4. Build `POST /api/auth/login` (OTP initiation) and `POST /api/auth/verify-otp`
-5. Implement OTP SMS provider (MSG91 recommended for India)
-6. Implement email verification flow
-7. Profile completeness scoring function + `GET /api/profile/completeness` endpoint
+- Subscription plans & Razorpay payment integration
+- Phone number unlock (premium gate)
+- Admin panel: flagged photo queue, moderation actions
+- Production: switch `CHANNEL_LAYERS` to Redis, deploy with Daphne/ASGI
