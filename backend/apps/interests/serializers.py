@@ -27,4 +27,4 @@ class InterestSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Interest
-        fields = ['id', 'status', 'created_at', 'sender_profile', 'receiver_profile']
+        fields = ['id', 'status', 'message', 'created_at', 'sender_profile', 'receiver_profile']

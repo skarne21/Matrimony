@@ -6,7 +6,8 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      redirect: '/register',
+      component: () => import('../views/Landing.vue'),
+      meta: { guest: true },
     },
     {
       path: '/register',
@@ -36,6 +37,16 @@ const router = createRouter({
     {
       path: '/interests',
       component: () => import('../views/Interests.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/conversations',
+      component: () => import('../views/Inbox.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/conversations/:id',
+      component: () => import('../views/ChatView.vue'),
       meta: { requiresAuth: true },
     },
   ],

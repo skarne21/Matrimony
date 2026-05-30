@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRegistrationStore } from '../../../stores/registration'
+import PhoneInput from '../../../components/PhoneInput.vue'
 
 const reg = useRegistrationStore()
 
@@ -92,7 +93,7 @@ function setCreatedBy(v: string) { reg.profile_created_by = v }
 
     <div class="form-group">
       <label>Mobile Number *</label>
-      <input type="tel" v-model="reg.phone_number" placeholder="+91 98765 43210" />
+      <PhoneInput v-model="reg.phone_number" />
     </div>
 
     <div class="form-group">

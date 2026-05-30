@@ -34,7 +34,8 @@ class SendInterestView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        interest = Interest.objects.create(sender=request.user, receiver=receiver)
+        message = request.data.get('message', '').strip()
+        interest = Interest.objects.create(sender=request.user, receiver=receiver, message=message)
         return Response(InterestSerializer(interest).data, status=status.HTTP_201_CREATED)
 
 
@@ -56,6 +57,13 @@ class ManageInterestView(APIView):
             if interest.status != InterestStatus.PENDING:
                 return Response({'error': 'Interest is not pending.'}, status=status.HTTP_400_BAD_REQUEST)
             interest.status = InterestStatus.ACCEPTED
+            interest.save()
+            from apps.conversations.models import Conversation
+            Conversation.objects.get_or_create(
+                interest=interest,
+                defaults={'user_one': interest.sender, 'user_two': interest.receiver},
+            )
+            return Response(InterestSerializer(interest).data)
 
         elif action == 'decline':
             if interest.receiver != request.user:
@@ -102,12 +110,24 @@ class InterestWithUserView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, user_id):
+        def conversation_id(interest):
+            try:
+                return str(interest.conversation.id)
+            except Exception:
+                return None
+
         sent = Interest.objects.filter(sender=request.user, receiver__id=user_id).first()
         if sent:
-            return Response({'id': sent.id, 'status': sent.status, 'direction': 'sent'})
+            return Response({
+                'id': sent.id, 'status': sent.status, 'direction': 'sent',
+                'message': sent.message, 'conversation_id': conversation_id(sent),
+            })
 
         received = Interest.objects.filter(sender__id=user_id, receiver=request.user).first()
         if received:
-            return Response({'id': received.id, 'status': received.status, 'direction': 'received'})
+            return Response({
+                'id': received.id, 'status': received.status, 'direction': 'received',
+                'message': received.message, 'conversation_id': conversation_id(received),
+            })
 
         return Response(None)

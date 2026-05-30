@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../../stores/auth'
 import api from '../../api/index'
+import PhoneInput from '../../components/PhoneInput.vue'
 
 const auth = useAuthStore()
 const router = useRouter()
@@ -43,7 +44,7 @@ async function sendOTP() {
 
       <div class="form-group">
         <label>Mobile Number</label>
-        <input type="tel" v-model="phone" placeholder="+91 98765 43210" @keydown.enter="sendOTP" />
+        <PhoneInput v-model="phone" />
       </div>
 
       <button class="btn btn-primary btn-full" :disabled="!phone.trim() || loading" @click="sendOTP">

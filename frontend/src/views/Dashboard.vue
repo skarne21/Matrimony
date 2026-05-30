@@ -67,6 +67,7 @@ onMounted(() => loadPage(1))
       <div style="display:flex; gap:12px; align-items:center;">
         <span style="font-size:14px; color:#888;">{{ total }} matches found</span>
         <button class="btn btn-secondary" style="padding:8px 16px; font-size:13px;" @click="router.push('/interests')">Interests</button>
+        <button class="btn btn-secondary" style="padding:8px 16px; font-size:13px;" @click="router.push('/conversations')">Messages</button>
         <button class="btn btn-secondary" style="padding:8px 16px; font-size:13px;" @click="logout">Logout</button>
       </div>
     </nav>

@@ -25,6 +25,7 @@ class Interest(models.Model):
         choices=InterestStatus.choices,
         default=InterestStatus.PENDING,
     )
+    message = models.TextField(blank=True, default='')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

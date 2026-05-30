@@ -77,13 +77,52 @@ Matrimony/
 
 ### Installation
 
-```bash
+```powershell
 # Clone the repository
 git clone https://github.com/skarne21/Matrimony.git
 cd Matrimony
 ```
 
-Frontend and backend setup instructions will follow in Phase 1.
+**Backend setup:**
+```powershell
+cd backend
+
+# Create and activate virtual environment
+python -m venv venv
+venv\Scripts\activate
+
+# Install Python dependencies
+pip install -r requirements.txt
+
+# Copy the env template and fill in your values
+copy .env.example .env
+```
+
+> Edit `backend/.env` and set `DB_PASSWORD`, `SECRET_KEY`, AWS keys, and Razorpay keys before continuing.
+
+```powershell
+# Apply database migrations
+python manage.py migrate
+```
+
+**Frontend setup:**
+```powershell
+cd frontend
+npm install
+```
+
+### Running the App
+
+**Backend** (runs on `http://localhost:8000`) — open a terminal in the `backend/` folder:
+```powershell
+venv\Scripts\activate
+python manage.py runserver
+```
+
+**Frontend** (runs on `http://localhost:5173`) — open a separate terminal in the `frontend/` folder:
+```powershell
+npm run dev
+```
 
 ---
 

@@ -53,6 +53,8 @@ interface InterestState {
   id: number
   status: string
   direction: 'sent' | 'received'
+  message: string
+  conversation_id: string | null
 }
 
 const route = useRoute()
@@ -64,6 +66,8 @@ const interest = ref<InterestState | null>(null)
 const loading = ref(true)
 const actionLoading = ref(false)
 const error = ref('')
+const showNoteInput = ref(false)
+const connectNote = ref('')
 
 const isOwnProfile = () => auth.userId === route.params.id
 
@@ -80,11 +84,13 @@ async function loadInterestStatus() {
   } catch { /* non-blocking */ }
 }
 
-async function sendInterest() {
+async function sendInterest(message = '') {
   actionLoading.value = true
   try {
-    const { data } = await api.post('/api/interests/', { receiver_id: route.params.id })
-    interest.value = { id: data.id, status: data.status, direction: 'sent' }
+    const { data } = await api.post('/api/interests/', { receiver_id: route.params.id, message })
+    interest.value = { id: data.id, status: data.status, direction: 'sent', message: data.message, conversation_id: null }
+    showNoteInput.value = false
+    connectNote.value = ''
   } catch { /* ignore */ } finally {
     actionLoading.value = false
   }
@@ -107,8 +113,17 @@ async function respondToInterest(action: 'accept' | 'decline') {
   try {
     const { data } = await api.patch(`/api/interests/${interest.value.id}/`, { action })
     interest.value = { ...interest.value, status: data.status }
+    if (action === 'accept') await loadInterestStatus()
   } catch { /* ignore */ } finally {
     actionLoading.value = false
+  }
+}
+
+function openChat() {
+  if (interest.value?.conversation_id) {
+    router.push(`/conversations/${interest.value.conversation_id}`)
+  } else {
+    router.push('/conversations')
   }
 }
 
@@ -158,44 +173,70 @@ onMounted(async () => {
             <p style="font-size:14px; color:#888; margin-top:8px; line-height:1.5;" v-if="profile.bio">{{ profile.bio }}</p>
 
             <!-- Interest actions -->
-            <div v-if="!isOwnProfile()" style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap;">
-              <!-- No relationship -->
+            <div v-if="!isOwnProfile()" style="margin-top:16px;">
+              <!-- No relationship — Connect + optional note -->
               <template v-if="!interest">
-                <button class="btn btn-primary" :disabled="actionLoading" @click="sendInterest">
-                  {{ actionLoading ? '…' : '💌 Send Interest' }}
-                </button>
+                <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+                  <button class="btn btn-primary" :disabled="actionLoading" @click="sendInterest()">
+                    {{ actionLoading ? '…' : 'Connect' }}
+                  </button>
+                  <button class="btn btn-secondary" style="font-size:13px;" @click="showNoteInput = !showNoteInput">
+                    {{ showNoteInput ? 'Cancel' : 'Add a note' }}
+                  </button>
+                </div>
+                <div v-if="showNoteInput" style="margin-top:12px;">
+                  <textarea
+                    v-model="connectNote"
+                    placeholder="Write a short note with your request… (optional)"
+                    maxlength="300"
+                    style="width:100%; padding:10px 12px; border:1.5px solid #ddd; border-radius:8px; font-family:inherit; font-size:14px; resize:vertical; min-height:80px; outline:none;"
+                  />
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+                    <span style="font-size:12px; color:#aaa;">{{ connectNote.length }}/300</span>
+                    <button class="btn btn-primary" style="padding:8px 20px; font-size:13px;" :disabled="actionLoading" @click="sendInterest(connectNote)">
+                      {{ actionLoading ? '…' : 'Send with note' }}
+                    </button>
+                  </div>
+                </div>
               </template>
 
               <!-- I sent, pending -->
               <template v-else-if="interest.direction === 'sent' && interest.status === 'pending'">
-                <button class="btn btn-secondary" :disabled="actionLoading" @click="withdrawInterest">
-                  {{ actionLoading ? '…' : 'Withdraw Interest' }}
-                </button>
+                <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                  <span style="font-size:14px; color:#888;">Request sent</span>
+                  <button class="btn btn-secondary" style="font-size:13px;" :disabled="actionLoading" @click="withdrawInterest">
+                    {{ actionLoading ? '…' : 'Withdraw' }}
+                  </button>
+                </div>
+                <p v-if="interest.message" style="font-size:13px; color:#aaa; margin-top:8px; font-style:italic;">"{{ interest.message }}"</p>
               </template>
 
-              <!-- I sent, accepted -->
-              <template v-else-if="interest.direction === 'sent' && interest.status === 'accepted'">
-                <span style="background:#e8f5e9; color:#27ae60; font-size:14px; font-weight:700; padding:10px 18px; border-radius:8px;">✓ Connected</span>
+              <!-- Connected (either direction) -->
+              <template v-else-if="interest.status === 'accepted'">
+                <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                  <span style="background:#e8f5e9; color:#27ae60; font-size:14px; font-weight:700; padding:10px 18px; border-radius:8px;">✓ Connected</span>
+                  <button class="btn btn-primary" @click="openChat">Message</button>
+                </div>
               </template>
 
               <!-- I sent, declined -->
               <template v-else-if="interest.direction === 'sent' && interest.status === 'declined'">
-                <span style="color:#aaa; font-size:14px; padding:10px 0;">Interest was declined</span>
+                <span style="color:#aaa; font-size:14px;">Request was declined</span>
               </template>
 
               <!-- They sent me, pending -->
               <template v-else-if="interest.direction === 'received' && interest.status === 'pending'">
-                <button class="btn btn-primary" :disabled="actionLoading" @click="respondToInterest('accept')" style="background:#27ae60;">
-                  {{ actionLoading ? '…' : '✓ Accept' }}
-                </button>
-                <button class="btn btn-secondary" :disabled="actionLoading" @click="respondToInterest('decline')">
-                  Decline
-                </button>
-              </template>
-
-              <!-- They sent me, accepted -->
-              <template v-else-if="interest.direction === 'received' && interest.status === 'accepted'">
-                <span style="background:#e8f5e9; color:#27ae60; font-size:14px; font-weight:700; padding:10px 18px; border-radius:8px;">✓ Connected</span>
+                <div v-if="interest.message" style="background:#fff8f0; border:1px solid #f0e0c0; border-radius:8px; padding:12px; margin-bottom:12px; font-size:14px; color:#555; font-style:italic;">
+                  "{{ interest.message }}"
+                </div>
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                  <button class="btn btn-primary" :disabled="actionLoading" @click="respondToInterest('accept')" style="background:#27ae60;">
+                    {{ actionLoading ? '…' : '✓ Accept' }}
+                  </button>
+                  <button class="btn btn-secondary" :disabled="actionLoading" @click="respondToInterest('decline')">
+                    Decline
+                  </button>
+                </div>
               </template>
             </div>
           </div>
